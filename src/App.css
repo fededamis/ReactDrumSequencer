@@ -1,0 +1,90 @@
+:root {
+	--main-bg-color: #1e1e21;
+}
+
+.App {	
+	background-color: #1e1e21;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;  
+	font-size: calc(10px + 2vmin);
+	color: white;
+}
+
+#appTitle {
+	text-align: center;
+} 
+
+.SampleName {
+	/* display: inline-block;
+	float: left; */
+	width: 4em; 
+} 
+
+.SequencerBody {
+	/* float: left; */
+	background-color: #28282c; 
+	width: fit-content;
+}
+
+.PlayButton {
+	background: #36363c;
+    border-radius: 4px; 
+	cursor: pointer;
+	font-size: calc(2vmin);
+    /* width: 50px; 
+    height: 50px; */
+	margin: 1em;
+	padding: 1em;
+    box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
+	transition: background 100ms ease; 	
+	color:white;
+}
+
+.BPMButton {
+	display: inline-grid;
+	font-size: calc(2vmin);
+	vertical-align: middle;
+	width: 30%;	
+	margin: 1em;
+}
+
+.BPMButton input {
+	width: inherit;
+	background: #36363c;
+	color:white;
+	border-radius: 4px; 
+	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
+	padding: 1em;
+}
+
+.Pads {
+	box-sizing: border-radius;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.Pad {
+	background: #36363c;
+    border-radius: 4px; 
+    cursor: pointer;
+    width: 50px; 
+    height: 50px;
+    margin: 5px;
+    box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
+	transition: background 100ms ease; 	
+}
+
+.Pad:hover {	
+	background: #42424a;
+} 
+
+.Pad.active {
+	background: #42424a;
+}
+
+.Pad.on {
+	background: #0087ff!important;
+    box-shadow: 0 0 12px 0 rgba(0,135,255,.8);
+}

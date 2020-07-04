@@ -5,6 +5,7 @@ class PlayBack extends React.Component {
 
     playbackInterval = null;
     playbackBPM = null;
+    audioContext = null;
 
     render() {
 
@@ -27,8 +28,17 @@ class PlayBack extends React.Component {
 
         return (<div></div>);
     }
+
+    loadAudioContext() {
+        window.AudioContext = window.AudioContext||window.webkitAudioContext;
+        this.audioContext = new AudioContext();
+    }    
     
     playSetInterval() {
+
+        if (this.audioContext == null)
+            this.loadAudioContext();
+
         this.playbackBPM = this.props.bpm;                 
         this.playbackInterval = setInterval( ()=> this.play(), 0.25 * 60 / this.playbackBPM * 1000);
         /*
@@ -36,65 +46,97 @@ class PlayBack extends React.Component {
         4 beats  			    _______ 2 seg
         1 beat    			    _______ 0.5 seg
         0.25 beat (1 cuadrado)  _______ (0.25 * 60 / BPM) * 1000 (milisegundos)			
-        */        
+        */         
     }     
 
-    play() {       
+    async play() {                    
         
-        /*
-        EJECUTAR EL AUDIO DE FORMA DISTINTA PARA QUE SEA MAS PRECISO
-        https://www.html5rocks.com/en/tutorials/webaudio/intro/
-        https://stackoverflow.com/questions/54509959/how-do-i-play-audio-files-synchronously-in-javascript
-        */
-
         var activeStep = this.props.activeStep;
         var pads = this.props.pads;
-        var samples = this.props.samples; 
-        //this.playActiveStep(activeStep, pads, samples).then(() => this.props.incrementStep());
+        var samples = this.props.samples;         
+
+        var samplesToBePlayedArray = [];  
 
         for (var i = 0; i < pads.length; i++) {		
         	var group = pads[i];
         	var sampleBox = group[activeStep];
         	if (sampleBox == 1) {
-        		var samplePath = samples[i].path;			
-        		var audio = new Audio(samplePath);			
-        		audio.play();  
+                var samplePath = samples[i].path;                
+                var buffer = await this.loadSample(samplePath);  
+                samplesToBePlayedArray.push(buffer);			        		
         	}		
-        } 
-        this.props.incrementStep();         
+        }       
+        
+        var mixBuffer = this.mix(samplesToBePlayedArray);
+        this.playSample(mixBuffer); 
+        this.props.incrementStep();             
+    }    
+
+    loadSample(path) {
+        return new Promise((resolve, reject)=> {            
+            var request = new XMLHttpRequest();
+            request.open('GET', path, true);
+            request.responseType = 'arraybuffer';     
+            request.onload = () => {
+                this.audioContext.decodeAudioData(request.response, 
+                    (buffer) => {resolve(buffer);},
+                    null);
+            };
+            request.send();            
+        });              
     }
+    
+    mix(buffers) {
 
-    playActiveStep(activeStep, pads, samples) { 
-        return new Promise(async function(resolve, reject) {            
+        if (buffers == null || buffers.length == 0)
+            return;
 
-            var audioArray = [];
-
-            for (var i = 0; i < pads.length; i++) {		
-                var group = pads[i];
-                var sampleBox = group[activeStep];
-                if (sampleBox == 1) {
-                    var samplePath = samples[i].path;			
-                    var audio = new Audio(samplePath);			
-                    audioArray.push(audio);                    
-                }		
-            } 
-
-            if (audioArray.length == 0)
-                resolve();
-
-            for (var i = 0; i < audioArray.length; i++) {	
-
-                audioArray[i].play();
-
-                if (i == audioArray.length -1) {
-                    debugger;
-                    //audioArray[i].play().then(resolve());
-                    await audioArray[i].play();
+        //Obtengo la cantidad maxima de canales y duracion entre todas las muestras a mezclar 
+        var maxChannels = 0;
+        var maxDuration = 0; 
+    
+        for (var i = 0; i < buffers.length; i++) {
+            if (buffers[i].numberOfChannels > maxChannels) {
+                maxChannels = buffers[i].numberOfChannels;
+            }
+            if (buffers[i].duration > maxDuration) {
+                maxDuration = buffers[i].duration;
+            }
+        }   
+        
+        var mixed = this.audioContext.createBuffer(
+            maxChannels, 
+            this.audioContext.sampleRate * maxDuration, 
+            this.audioContext.sampleRate);        
+    
+        //Recorro cada mustra
+        for (var j=0; j<buffers.length; j++){    
+            //Recorro cada canal
+            for (var srcChannel = 0; srcChannel < buffers[j].numberOfChannels; srcChannel++) {                
+                //Obtengo el canal en donde vamos a hacer la mezcla
+                var _out = mixed.getChannelData(srcChannel);
+                //Obtengo el canal a mezclar
+                var _in = buffers[j].getChannelData(srcChannel);    
+                //Recorro cada muestra de audio para sumar y hacer la mezcla
+                for (var i = 0; i < _in.length; i++) {
+                    _out[i] += _in[i];
                 }
             }
-            resolve();            
-        });
+        }    
+        return mixed;
     }
+
+    playSample(buffer) {
+
+        if (buffer == null || buffer.length == 0)
+            return;
+
+        var source = this.audioContext.createBufferSource(); 
+        source.buffer = buffer;                    
+        source.connect(this.audioContext.destination);
+        //source.onended = () => this.props.incrementStep();
+        source.start(0); 
+    } 
 
     pause() {
         clearInterval(this.playbackInterval);

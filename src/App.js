@@ -2,9 +2,9 @@ import React from 'react';
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import './App.css';
-import Header from './components/Header'
+import Header from './components/Header';
 import Sequencer from './components/Sequencer';
-import Footer from './components/Footer'
+import Footer from './components/Footer';
 
 const defaultPads = [
 	[1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
@@ -38,7 +38,7 @@ const samples = [
 
 const initialState = {
 	pads: defaultPads,
-	bpm: 10,    
+	bpm: 90,    
 	activeStep: 0,
 	maxSteps: 15,
 	playing: false,   
@@ -58,8 +58,7 @@ function reducer(state = initialState, action) {
 			newPadsArray[padGroupIndex][padIndex] = targetPadState == 1 ? 0 : 1;
 			clonedState.pads = newPadsArray; 			
 			return clonedState;
-		case 'INCREMENT_STEP':
-			debugger;
+		case 'INCREMENT_STEP':			
 			var clonedState = JSON.parse(JSON.stringify(state));
 			var maxSteps = clonedState.maxSteps;
 
@@ -95,7 +94,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">  
-				<Provider store={store}>
+				<Provider store={store}>									
 					<Header/>
 					<Sequencer className="Sequencer"/> 
 					<Footer/>     

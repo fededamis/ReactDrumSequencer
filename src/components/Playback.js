@@ -6,11 +6,14 @@ class PlayBack extends React.Component {
     playbackInterval = null;
     playbackBPM = null;
     audioContext = null;
+    nextPlaybackTime = 0.0;
+    loadedSamples = null;
 
-    render() {
+    async render() {
 
         //VER POR QUE EL RENDER SE EJECUTA DOS VECES  
-        this.loadAudioContext();    
+        this.loadAudioContext();
+        //this.preLoadSamples();    
         var isPlaying = this.props.playing;        
         
         if (isPlaying && this.playbackInterval == null)
@@ -30,6 +33,22 @@ class PlayBack extends React.Component {
         return (<div></div>);
     }
 
+    async preLoadSamples() {
+
+        debugger; 
+
+        if (this.loadedSamples != null)
+            return;
+
+        this.loadedSamples = this.props.samples;       
+
+        this.loadedSamples.forEach(sample => {
+            var path = sample.path;
+            var buffer = await this.loadSample(path);    
+            sample.buffer = buffer; 
+        }); 
+    } 
+
     loadAudioContext() {
 
         if (this.audioContext != null)
@@ -38,25 +57,39 @@ class PlayBack extends React.Component {
         window.AudioContext = window.AudioContext||window.webkitAudioContext;
         this.audioContext = new AudioContext();
         
-        // Se reproduce un buffer de silencio para "despertar" el audio
-        // y evitar glitches en la primer reproducción
+        // Se reproduce un buffer de silencio para "despertar" el audio        
         var buffer = this.audioContext.createBuffer(1, 1, 22050);
         var node = this.audioContext.createBufferSource();
         node.buffer = buffer;
-        node.start(0);         
+        node.start(0);          
     }    
     
     playSetInterval() {        
-
+        
         this.playbackBPM = this.props.bpm;                 
-        this.playbackInterval = setInterval( ()=> this.play(), 0.25 * 60 / this.playbackBPM * 1000);
+        //this.playbackInterval = setInterval( ()=> this.play(), 0.25 * 60 / this.playbackBPM * 1000);
+        this.playbackInterval = setInterval( ()=> this.scheduler(), 25);
         /*
         120 beats 			    _______ 60 seg
         4 beats  			    _______ 2 seg
         1 beat    			    _______ 0.5 seg
         0.25 beat (1 cuadrado)  _______ (0.25 * 60 / BPM) * 1000 (milisegundos)			
         */         
-    }     
+    }  
+    
+    scheduler() {
+        debugger;
+
+        //Evito acumular samples agendados anteriores al tiempo actual,
+        //que luego se ejecutan todos juntos
+        if (this.nextPlaybackTime < this.audioContext.currentTime)
+            this.nextPlaybackTime = this.audioContext.currentTime;
+
+        while (this.nextPlaybackTime < this.audioContext.currentTime + 0.1 ) {          
+            this.play(); 
+            this.nextPlaybackTime += 0.25 * 60 / this.playbackBPM; 
+        } 
+    }    
 
     async play() {                    
         
@@ -71,14 +104,14 @@ class PlayBack extends React.Component {
         	var sampleBox = group[activeStep];
         	if (sampleBox == 1) {
                 var samplePath = samples[i].path;                
-                var buffer = await this.loadSample(samplePath);  
+                var buffer = await this.loadSample(samplePath);   
                 samplesToBePlayedArray.push(buffer);			        		
         	}		
         }       
         
         var mixBuffer = this.mix(samplesToBePlayedArray);
-        this.playSample(mixBuffer); 
-        this.props.incrementStep();             
+        this.playSample(mixBuffer);  
+        this.props.incrementStep();                
     }    
 
     loadSample(path) {
@@ -144,7 +177,11 @@ class PlayBack extends React.Component {
         source.buffer = buffer;                    
         source.connect(this.audioContext.destination);
         //source.onended = () => this.props.incrementStep();
-        source.start(0); 
+
+        //Evito acumular samples agendados anteriores al tiempo actual,
+        //que luego se ejecutan todos juntos 
+        if (this.nextPlaybackTime > this.audioContext.currentTime)
+            source.start(this.nextPlaybackTime);         
     } 
 
     pause() {

@@ -9,7 +9,8 @@ class PlayBack extends React.Component {
 
     render() {
 
-        //VER POR QUE EL RENDER SE EJECUTA DOS VECES       
+        //VER POR QUE EL RENDER SE EJECUTA DOS VECES  
+        this.loadAudioContext();    
         var isPlaying = this.props.playing;        
         
         if (isPlaying && this.playbackInterval == null)
@@ -30,14 +31,22 @@ class PlayBack extends React.Component {
     }
 
     loadAudioContext() {
+
+        if (this.audioContext != null)
+            return;
+
         window.AudioContext = window.AudioContext||window.webkitAudioContext;
         this.audioContext = new AudioContext();
+        
+        // Se reproduce un buffer de silencio para "despertar" el audio
+        // y evitar glitches en la primer reproducción
+        var buffer = this.audioContext.createBuffer(1, 1, 22050);
+        var node = this.audioContext.createBufferSource();
+        node.buffer = buffer;
+        node.start(0);         
     }    
     
-    playSetInterval() {
-
-        if (this.audioContext == null)
-            this.loadAudioContext();
+    playSetInterval() {        
 
         this.playbackBPM = this.props.bpm;                 
         this.playbackInterval = setInterval( ()=> this.play(), 0.25 * 60 / this.playbackBPM * 1000);

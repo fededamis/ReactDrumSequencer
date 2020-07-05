@@ -9,11 +9,11 @@ class PlayBack extends React.Component {
     nextPlaybackTime = 0.0;
     loadedSamples = null;
 
-    async render() {
+    render() {
 
         //VER POR QUE EL RENDER SE EJECUTA DOS VECES  
         this.loadAudioContext();
-        //this.preLoadSamples();    
+        this.preLoadSamples();     
         var isPlaying = this.props.playing;        
         
         if (isPlaying && this.playbackInterval == null)
@@ -28,26 +28,9 @@ class PlayBack extends React.Component {
                 this.playbackInterval = null;
                 this.playSetInterval();
             }
-        }
-
+        } 
         return (<div></div>);
     }
-
-    async preLoadSamples() {
-
-        debugger; 
-
-        if (this.loadedSamples != null)
-            return;
-
-        this.loadedSamples = this.props.samples;       
-
-        this.loadedSamples.forEach(sample => {
-            var path = sample.path;
-            var buffer = await this.loadSample(path);    
-            sample.buffer = buffer; 
-        }); 
-    } 
 
     loadAudioContext() {
 
@@ -61,59 +44,19 @@ class PlayBack extends React.Component {
         var buffer = this.audioContext.createBuffer(1, 1, 22050);
         var node = this.audioContext.createBufferSource();
         node.buffer = buffer;
-        node.start(0);          
+        node.start(0);            
     }    
+
+    preLoadSamples() {       
+        if (this.loadedSamples != null)
+            return;
+        this.loadedSamples = this.props.samples;       
+        this.loadedSamples.forEach(async sample => {
+            var path = sample.path;            
+            sample.buffer = await this.loadSample(path);   
+        });  
+    }
     
-    playSetInterval() {        
-        
-        this.playbackBPM = this.props.bpm;                 
-        //this.playbackInterval = setInterval( ()=> this.play(), 0.25 * 60 / this.playbackBPM * 1000);
-        this.playbackInterval = setInterval( ()=> this.scheduler(), 25);
-        /*
-        120 beats 			    _______ 60 seg
-        4 beats  			    _______ 2 seg
-        1 beat    			    _______ 0.5 seg
-        0.25 beat (1 cuadrado)  _______ (0.25 * 60 / BPM) * 1000 (milisegundos)			
-        */         
-    }  
-    
-    scheduler() {
-        debugger;
-
-        //Evito acumular samples agendados anteriores al tiempo actual,
-        //que luego se ejecutan todos juntos
-        if (this.nextPlaybackTime < this.audioContext.currentTime)
-            this.nextPlaybackTime = this.audioContext.currentTime;
-
-        while (this.nextPlaybackTime < this.audioContext.currentTime + 0.1 ) {          
-            this.play(); 
-            this.nextPlaybackTime += 0.25 * 60 / this.playbackBPM; 
-        } 
-    }    
-
-    async play() {                    
-        
-        var activeStep = this.props.activeStep;
-        var pads = this.props.pads;
-        var samples = this.props.samples;         
-
-        var samplesToBePlayedArray = [];  
-
-        for (var i = 0; i < pads.length; i++) {		
-        	var group = pads[i];
-        	var sampleBox = group[activeStep];
-        	if (sampleBox == 1) {
-                var samplePath = samples[i].path;                
-                var buffer = await this.loadSample(samplePath);   
-                samplesToBePlayedArray.push(buffer);			        		
-        	}		
-        }       
-        
-        var mixBuffer = this.mix(samplesToBePlayedArray);
-        this.playSample(mixBuffer);  
-        this.props.incrementStep();                
-    }    
-
     loadSample(path) {
         return new Promise((resolve, reject)=> {            
             var request = new XMLHttpRequest();
@@ -126,7 +69,58 @@ class PlayBack extends React.Component {
             };
             request.send();            
         });              
-    }
+    }    
+    
+    playSetInterval() {         
+        this.playbackBPM = this.props.bpm; 
+        this.playbackInterval = setInterval( ()=> this.scheduler(), 25);        
+    }   
+    
+    scheduler() {       
+
+        //Se utiliza una estrategia de "Audio Scheduling" para agendar 
+        //los audios a reproducir segun el clock de Web Audio API y no segun
+        //el clock que utiliza internamente el navagador para setTimeout. 
+        //https://www.html5rocks.com/en/tutorials/audio/scheduling/
+
+        //Evito acumular samples agendados anteriores al tiempo actual,
+        //que luego se ejecutan todos juntos  
+        if (this.nextPlaybackTime < this.audioContext.currentTime)
+            this.nextPlaybackTime = this.audioContext.currentTime; 
+
+        while (this.nextPlaybackTime < this.audioContext.currentTime + 0.1 ) {          
+            this.play(); 
+            this.nextPlaybackTime += 0.25 * 60 / this.playbackBPM; 
+            /*
+            120 beats per minute    _______ 60 seg
+            4 beats  			    _______ 2 seg
+            1 beat    			    _______ 0.5 seg
+            0.25 beat (1 cuadrado)  _______ (0.25 * 60 / BPM)
+            */           
+        }  
+    }    
+
+    play() {           
+        
+        var activeStep = this.props.activeStep;
+        var pads = this.props.pads;
+        var samples = this.loadedSamples;          
+
+        var samplesToBePlayedArray = [];   
+
+        for (var i = 0; i < pads.length; i++) {		
+        	var group = pads[i];
+            var sampleBox = group[activeStep];                                 
+        	if (sampleBox == 1) {                
+                var buffer = samples[i].buffer;
+                samplesToBePlayedArray.push(buffer);  			        		
+        	}  		
+        }       
+        
+        var mixBuffer = this.mix(samplesToBePlayedArray);
+        this.playSample(mixBuffer);   
+        this.props.incrementStep();                     
+    }        
     
     mix(buffers) {
 
@@ -170,18 +164,17 @@ class PlayBack extends React.Component {
 
     playSample(buffer) {
 
-        if (buffer == null || buffer.length == 0)
-            return;
+        if (buffer == null || buffer.length == 0)             
+            return;         
 
         var source = this.audioContext.createBufferSource(); 
         source.buffer = buffer;                    
-        source.connect(this.audioContext.destination);
-        //source.onended = () => this.props.incrementStep();
+        source.connect(this.audioContext.destination);        
 
         //Evito acumular samples agendados anteriores al tiempo actual,
-        //que luego se ejecutan todos juntos 
-        if (this.nextPlaybackTime > this.audioContext.currentTime)
-            source.start(this.nextPlaybackTime);         
+        //que luego se ejecutan todos juntos  
+        if (this.nextPlaybackTime >= this.audioContext.currentTime)
+            source.start(this.nextPlaybackTime);                   
     } 
 
     pause() {

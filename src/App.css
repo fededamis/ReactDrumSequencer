@@ -82,6 +82,11 @@
 	flex-wrap: wrap;
 }
 
+.Pad-container {
+	display: inline-flex;
+	font-size: 1.5em	
+}
+
 .Pads span {
 	display: none;
 }

@@ -11,16 +11,21 @@ class Pads extends React.Component {
             {this.props.pads.map((padGroup, padGroupIndex) => (
                 <div key={padGroupIndex} className='Pads'> 
                     <SampleName sampleId={padGroupIndex}/> 
-                    {padGroup.map( (pad, padIndex) => (                        
-                        <div key={padIndex}
-                        className={cx('Pad',{
-                            active: padIndex == this.props.activeStep,
-                            on: pad == 1
-                        })}
-                        onClick={() => {
-                            this.props.togglePad(padGroupIndex, padIndex)                            
-                        }}>                                           
-                        </div>                             
+                    {padGroup.map( (pad, padIndex) => (  
+                        <div className='Pad-container'>
+                            <div key={padIndex}
+                            className={cx('Pad',{
+                                active: padIndex == this.props.activeStep,
+                                on: pad == 1
+                            })}
+                            onClick={() => {
+                                this.props.togglePad(padGroupIndex, padIndex)                            
+                            }}>                                           
+                            </div>                             
+                            <span className={cx({                                
+                                visible: [3,7,11].includes(padIndex)
+                            })}>|</span>   
+                        </div>                       
                     ))}                
                 </div>          
             ))}

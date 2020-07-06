@@ -58,11 +58,36 @@
 	padding: 1em;
 }
 
+.VolumeFader {
+	display: inline-grid;
+	font-size: calc(2vmin);
+	vertical-align: middle;
+	width: 30%;	
+	margin: 1em;
+}
+
+.VolumeFader input {
+	width: inherit;
+	background: #36363c;
+	color:white;
+	border-radius: 4px; 
+	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
+	padding: 1em;
+}
+
 .Pads {
 	box-sizing: border-radius;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+}
+
+.Pads span {
+	display: none;
+}
+
+.Pads span.visible {
+	display: block;
 }
 
 .Pad {

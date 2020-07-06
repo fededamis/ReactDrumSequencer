@@ -42,7 +42,8 @@ const initialState = {
 	activeStep: 0,
 	maxSteps: 15,
 	playing: false,   
-	samples: samples
+	samples: samples,
+	gain: 1.0
   };
 
 function reducer(state = initialState, action) {	
@@ -82,6 +83,11 @@ function reducer(state = initialState, action) {
 			var clonedState = JSON.parse(JSON.stringify(state));
 			var newBPM = action.bpm;
 			clonedState.bpm = newBPM;
+			return clonedState;	
+		case 'CHANGE_GAIN':
+			var clonedState = JSON.parse(JSON.stringify(state));
+			var newGain = action.gain;
+			clonedState.gain = newGain;
 			return clonedState;	
 		default:
 			return state;

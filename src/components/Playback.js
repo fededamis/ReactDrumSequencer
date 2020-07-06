@@ -6,6 +6,7 @@ class PlayBack extends React.Component {
     playbackInterval = null; //Objeto setInterval de reproduccion
     playbackBPM = null; //BPM de reproduccion de playback
     audioContext = null; //Audio Context de Web Audio API
+    gainNode = null; //Nodo de ganancias para ajustar volumen
     nextPlaybackTime = 0.0; //Tiempo de proxima reproduccion de sample
     loadedSamples = null; //Audio samples precargados, para tenerlos cargados antes de reproducirlos.  
     scheduleFreq = 25.0; //Frecuencia del scheduler de audio (en milisegundos)
@@ -20,12 +21,13 @@ class PlayBack extends React.Component {
         this.preLoadSamples();     
         var isPlaying = this.props.playing;        
         
+        //Play
         if (isPlaying && this.playbackInterval == null)
-            this.playSetInterval();
-            
+            this.playSetInterval();            
+        //Pause
         if (!isPlaying && this.playbackInterval != null)
             this.pause();  
-            
+        //Cambio de Tempo
         if (this.playbackBPM != null) {
             if (this.playbackBPM != this.props.bpm) {                
                 if (this.props.bpm >= 30.0 && this.props.bpm <= 260.0) {
@@ -35,6 +37,11 @@ class PlayBack extends React.Component {
                 }                             
             }
         } 
+        //Cambio de ganancia        
+        if (this.gainNode != null) {
+            if (this.gainNode.gain.value != this.props.gain)            
+            this.gainNode.gain.linearRampToValueAtTime(this.props.gain, this.audioContext.currentTime + 0.3);
+        }      
         return (<div></div>);
     }
 
@@ -45,6 +52,7 @@ class PlayBack extends React.Component {
 
         window.AudioContext = window.AudioContext||window.webkitAudioContext;
         this.audioContext = new AudioContext();
+        this.gainNode = this.audioContext.createGain();
         
         // Se reproduce un buffer de silencio para "despertar" el audio        
         var buffer = this.audioContext.createBuffer(1, 1, 22050);
@@ -191,7 +199,8 @@ class PlayBack extends React.Component {
 
         var source = this.audioContext.createBufferSource(); 
         source.buffer = buffer;                    
-        source.connect(this.audioContext.destination);        
+        source.connect(this.gainNode);        
+        this.gainNode.connect(this.audioContext.destination);        
 
         //Evito acumular samples agendados anteriores al tiempo actual,
         //que luego se ejecutan todos juntos y causan glitches
@@ -212,7 +221,8 @@ const mapStateToProps = state => ({
     pads: state.pads,
     samples: state.samples,
     bpm: state.bpm,
-    maxSteps: state.maxSteps
+    maxSteps: state.maxSteps,
+    gain: state.gain
 }); 
 
 const mapDispatchToProps = dispatch => ({

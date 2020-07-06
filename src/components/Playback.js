@@ -3,11 +3,15 @@ import { connect } from "react-redux";
 
 class PlayBack extends React.Component { 
 
-    playbackInterval = null;
-    playbackBPM = null;
-    audioContext = null;
-    nextPlaybackTime = 0.0;
-    loadedSamples = null;
+    playbackInterval = null; //Objeto setInterval de reproduccion
+    playbackBPM = null; //BPM de reproduccion de playback
+    audioContext = null; //Audio Context de Web Audio API
+    nextPlaybackTime = 0.0; //Tiempo de proxima reproduccion de sample
+    loadedSamples = null; //Audio samples precargados, para tenerlos cargados antes de reproducirlos.  
+    scheduleFreq = 25.0; //Frecuencia del scheduler de audio (en milisegundos)
+    scheduleAheadTime = 0.1; //Capacidad del sheduler, en segundos. 
+    //Por ej si == 0.1, el sheduler agendará audios de los próximos 100 milisegundos desde 
+    //que comenzó. Luego se ejecutará el siguiente scheduler y agendará los 100 ms siguientes y así. 
 
     render() {
 
@@ -73,22 +77,22 @@ class PlayBack extends React.Component {
     
     playSetInterval() {         
         this.playbackBPM = this.props.bpm; 
-        this.playbackInterval = setInterval( ()=> this.scheduler(), 25);        
+        this.playbackInterval = setInterval( ()=> this.scheduler(), this.scheduleFreq);        
     }   
     
     scheduler() {       
 
-        //Se utiliza una estrategia de "Audio Scheduling" para agendar 
+        //Se utiliza una estrategia de "Audio Scheduling" para agendar  
         //los audios a reproducir segun el clock de Web Audio API y no segun
         //el clock que utiliza internamente el navagador para setTimeout. 
         //https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
         //Evito acumular samples agendados anteriores al tiempo actual,
-        //que luego se ejecutan todos juntos  
+        //que luego se ejecutan todos juntos y causan glitches
         if (this.nextPlaybackTime < this.audioContext.currentTime)
             this.nextPlaybackTime = this.audioContext.currentTime; 
 
-        while (this.nextPlaybackTime < this.audioContext.currentTime + 0.1 ) {          
+        while (this.nextPlaybackTime < this.audioContext.currentTime + this.scheduleAheadTime ) {          
             this.play(); 
             this.nextPlaybackTime += 0.25 * 60 / this.playbackBPM; 
             /*
@@ -102,7 +106,22 @@ class PlayBack extends React.Component {
 
     play() {           
         
-        var activeStep = this.props.activeStep;
+        var activeStep = this.props.activeStep; 
+        var maxSteps = this.props.maxSteps; 
+        
+        //Idealmente se deberia ejecutar el audio y luego avanzar el step, pero no es conveniente
+        //ejecutar callbacks luego de la reproduccion del audio, por razones de performance y sincronía
+        //del audio. Por lo tanto, se invierta la logica:
+        //Primero se adelanta visualmente el step y luego se ejecuta el sample de la posicion n+1
+        //para mentener en sincronía el audio con el indicador visual de step activo        
+
+        this.props.incrementStep();                       
+
+        if (activeStep == maxSteps) 
+            activeStep = 0;
+        else 
+            activeStep++;         
+
         var pads = this.props.pads;
         var samples = this.loadedSamples;          
 
@@ -117,9 +136,10 @@ class PlayBack extends React.Component {
         	}  		
         }       
         
+        //Se deben obtener todos los samples a reproducir en un momento dado y mixearlos en un único sample,
+        //para luego reproducirlo y que se escuchen en simultáneo.
         var mixBuffer = this.mix(samplesToBePlayedArray);
-        this.playSample(mixBuffer);   
-        this.props.incrementStep();                     
+        this.playSample(mixBuffer);           
     }        
     
     mix(buffers) {
@@ -172,7 +192,7 @@ class PlayBack extends React.Component {
         source.connect(this.audioContext.destination);        
 
         //Evito acumular samples agendados anteriores al tiempo actual,
-        //que luego se ejecutan todos juntos  
+        //que luego se ejecutan todos juntos y causan glitches
         if (this.nextPlaybackTime >= this.audioContext.currentTime)
             source.start(this.nextPlaybackTime);                   
     } 
@@ -189,7 +209,8 @@ const mapStateToProps = state => ({
     activeStep: state.activeStep,
     pads: state.pads,
     samples: state.samples,
-    bpm: state.bpm
+    bpm: state.bpm,
+    maxSteps: state.maxSteps
 }); 
 
 const mapDispatchToProps = dispatch => ({

@@ -1,13 +1,16 @@
 import React from 'react';
 import { connect } from "react-redux";
 
-class BPMButton extends React.Component {  
+class BPMButton extends React.Component {     
+
     render() {
         return (
             <div className="BPMButton">
                 <span>BPM</span> 
-                <input type="number" defaultValue={this.props.bpm} 
-                onBlur={(e) => this.props.changeBPM(e.target.value)}/>
+                <input type="number" min="0" max="260" step="1" 
+                value={this.props.bpm} onChange={(e) => this.props.changeBPM(e.target.value)}/>
+                <input type="range" min="30.0" max="260.0" step="1" 
+                value={this.props.bpm} onChange={(e) => this.props.changeBPM(e.target.value)}/> 
             </div>            
         );
     }       
@@ -18,7 +21,10 @@ const mapStateToProps = state => ({
 }); 
 
 const mapDispatchToProps = dispatch => ({
-    changeBPM: (newValue) => dispatch({ type: 'CHANGE_BPM', bpm: newValue }),
+    changeBPM: (newValue) => {              
+        newValue = parseFloat(newValue);        
+        dispatch({ type: 'CHANGE_BPM', bpm: newValue })
+    },
     play: () => dispatch({ type: 'PLAY' })
 }); 
 

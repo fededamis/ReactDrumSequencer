@@ -38,7 +38,7 @@ const samples = [
 
 const initialState = {
 	pads: defaultPads,
-	bpm: 90,     
+	bpm: 90.0,     
 	activeStep: 0,
 	maxSteps: 15,
 	playing: false,   

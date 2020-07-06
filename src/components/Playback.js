@@ -27,10 +27,12 @@ class PlayBack extends React.Component {
             this.pause();  
             
         if (this.playbackBPM != null) {
-            if (this.playbackBPM != this.props.bpm) {
-                clearInterval(this.playbackInterval);
-                this.playbackInterval = null;
-                this.playSetInterval();
+            if (this.playbackBPM != this.props.bpm) {                
+                if (this.props.bpm >= 30.0 && this.props.bpm <= 260.0) {
+                    clearInterval(this.playbackInterval);
+                    this.playbackInterval = null;
+                    this.playSetInterval();
+                }                             
             }
         } 
         return (<div></div>);

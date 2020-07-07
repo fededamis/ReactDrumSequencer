@@ -12,8 +12,8 @@ class Pads extends React.Component {
                 <div key={padGroupIndex} className='Pads'> 
                     <SampleName sampleId={padGroupIndex}/> 
                     {padGroup.map( (pad, padIndex) => (  
-                        <div className='Pad-container'>
-                            <div key={padIndex}
+                        <div key={padIndex} className='Pad-container'>
+                            <div 
                             className={cx('Pad',{
                                 active: padIndex == this.props.activeStep,
                                 on: pad == 1

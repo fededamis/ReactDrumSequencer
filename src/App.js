@@ -2,6 +2,10 @@ import React from 'react';
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import $ from 'jquery';
+import Popper from 'popper.js';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Header from './components/Header';
 import Sequencer from './components/Sequencer';
 import Footer from './components/Footer';
@@ -100,10 +104,12 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">  
-				<Provider store={store}>									
+				<Provider store={store}>
+				<div className="container-fluid">
 					<Header/>
 					<Sequencer className="Sequencer"/> 
-					<Footer/>     
+					<Footer/>     					
+				</div>									
 				</Provider>		
 			</div>
 		);

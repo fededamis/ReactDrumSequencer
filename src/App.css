@@ -72,14 +72,20 @@ html, body {
 .PadsGroup {
 
 
-}
-
-.Pads {
-	box-sizing: border-radius;
+} 
+ 
+.Pads {	
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	margin-left: 10px;
+	margin-right: 10px; 
 }
+
+.SampleName {	
+	width: 4em; 
+	flex-grow: 1;	
+} 
 
 .Pad-container {
 	display: inline-flex;
@@ -94,11 +100,6 @@ html, body {
 .Pads span.visible {
 	display: block;
 }
-
-.SampleName {	
-	width: 4em; 
-	margin-left: 10px; 	 
-} 
 
 .Pad {
 	background: #36363c;

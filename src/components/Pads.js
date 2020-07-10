@@ -7,7 +7,7 @@ class Pads extends React.Component {
 
     render() {
         return (
-            <div>                
+            <div className="PadsGroup">                 
             {this.props.pads.map((padGroup, padGroupIndex) => (
                 <div key={padGroupIndex} className='Pads'> 
                     <SampleName sampleId={padGroupIndex}/> 
@@ -23,7 +23,8 @@ class Pads extends React.Component {
                             }}>                                           
                             </div>                             
                             <span className={cx({                                
-                                visible: [3,7,11].includes(padIndex)
+                                visible: [3,7,11].includes(padIndex),
+                                hidden: ![3,7,11].includes(padIndex)
                             })}>|</span>   
                         </div>                       
                     ))}                

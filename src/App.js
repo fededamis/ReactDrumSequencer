@@ -2,13 +2,14 @@ import React from 'react';
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import $ from 'jquery';
 import Popper from 'popper.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Header from './components/Header';
 import Sequencer from './components/Sequencer';
 import Footer from './components/Footer';
+import {Helmet} from "react-helmet";
 
 const defaultPads = [
 	[1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
@@ -103,13 +104,14 @@ const store = createStore(reducer);
 class App extends React.Component {
 	render() {
 		return (
-			<div className="App">  
-				<Provider store={store}>
-				<div className="container-fluid">
+			<div className="App">	
+				<Helmet>
+					<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta> 
+				</Helmet>
+				<Provider store={store}>				
 					<Header/>
 					<Sequencer className="Sequencer"/> 
-					<Footer/>     					
-				</div>									
+					<Footer/>     				
 				</Provider>		
 			</div>
 		);

@@ -15,11 +15,10 @@ class PlayBack extends React.Component {
     //que comenzó. Luego se ejecutará el siguiente scheduler y agendará los 100 ms siguientes y así. 
 
     render() {
-
-        //VER POR QUE EL RENDER SE EJECUTA DOS VECES  
-        this.loadAudioContext();
+        
+        this.loadAudioContext(); 
         this.preLoadSamples();     
-        var isPlaying = this.props.playing;        
+        var isPlaying = this.props.playing;         
         
         //Play
         if (isPlaying && this.playbackInterval == null)
@@ -45,10 +44,10 @@ class PlayBack extends React.Component {
         return (<div></div>);
     }
 
-    loadAudioContext() {
+    loadAudioContext() {        
 
-        if (this.audioContext != null)
-            return;
+        if (this.audioContext != null)            
+            return;                    
 
         window.AudioContext = window.AudioContext||window.webkitAudioContext;
         this.audioContext = new AudioContext();
@@ -85,7 +84,8 @@ class PlayBack extends React.Component {
         });              
     }    
     
-    playSetInterval() {         
+    playSetInterval() {   
+        this.audioContext.resume();      
         this.playbackBPM = this.props.bpm; 
         this.playbackInterval = setInterval( ()=> this.scheduler(), this.scheduleFreq);        
     }   
@@ -211,7 +211,8 @@ class PlayBack extends React.Component {
     pause() {
         clearInterval(this.playbackInterval);
         this.playbackInterval = null; 
-        this.props.resetStep();        
+        this.props.resetStep();       
+        this.audioContext.suspend(); 
     }
 }
 

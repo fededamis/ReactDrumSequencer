@@ -20,27 +20,32 @@ html, body {
 
 .SequencerBody {	
 	background-color: #28282c; 	
-	margin: 5%;	
+	margin: 2%;	
 }
 
 .PlayButton {
 	background: #36363c;
-    border-radius: 4px; 
+    border-radius: 1vw; 
 	cursor: pointer;
-	font-size: calc(2vmin);    
-	margin: 1em;
-	padding: 1em;
+	font-size: 2.5vw;
+	margin: 1vw;
+	padding-left: 2vw;
+	padding-right: 2vw;
+	padding-top: 1vw;
+	padding-bottom: 1vw;
     box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
 	transition: background 100ms ease; 	
 	color:white;
 }
 
 .BPMButton {
-	display: inline-grid;
+	/* display: inline-grid; */
 	font-size: calc(2vmin);
 	vertical-align: middle;
 	width: 30%;	
 	margin: 1em;
+
+	display: none;
 }
 
 .BPMButton input {
@@ -53,11 +58,13 @@ html, body {
 }
 
 .VolumeFader {
-	display: inline-grid;
+	/* display: inline-grid; */
 	font-size: calc(2vmin);
 	vertical-align: middle;
 	width: 30%;	
 	margin: 1em;
+
+	display: none;
 }
 
 .VolumeFader input {
@@ -78,8 +85,8 @@ html, body {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
-	margin-left: 10px;
-	margin-right: 10px; 	
+	margin-left: 1vw;
+	margin-right: 1vw; 	
 }
 
 .SampleName {	

@@ -2,9 +2,6 @@ import React from 'react';
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import './App.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import $ from 'jquery';
-import Popper from 'popper.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Header from './components/Header';
 import Sequencer from './components/Sequencer';
@@ -107,6 +104,7 @@ class App extends React.Component {
 			<div className="App">	
 				<Helmet>
 					<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta> 
+					<title>React Sequencer</title> 
 				</Helmet>
 				<Provider store={store}>				
 					<Header/>

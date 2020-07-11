@@ -19,11 +19,15 @@ html, body {
 #appTitle {
 	text-align: center;
 	font-size: calc(8vmin);
+	margin: calc(5px + 0.4vw);	
 } 
 
 .SequencerBody {	
 	background-color: #28282c; 	
-	margin: 2%;	
+	margin-left: 2%;	
+	margin-right: 2%;	
+	margin-bottom: calc(10px + 0vw);
+	margin-top: calc(10px + 0vw);	
 }
 
 .PlayButton {
@@ -155,7 +159,12 @@ html, body {
 	text-align: center;
 	font-size: calc(7px + 0.6vw);
 	margin: 1vw;
+	margin-top: 0;
 }
+
+.Footer p {
+	margin-top: 1.15vw;
+} 
 
 .Footer a:link {
 	color: #0087ff;

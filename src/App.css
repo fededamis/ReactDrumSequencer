@@ -36,6 +36,12 @@ html, body {
     box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
 	transition: background 100ms ease; 	
 	color:white;
+	outline: none;
+}
+
+.PlayButton.started {
+	color: #0087ff;
+	border-color: #0087ff;
 }
 
 .BPMButton {
@@ -82,11 +88,6 @@ html, body {
 	border-radius: 4px; 
 	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);	
 }
-
-.PadsGroup {
-
-
-} 
  
 .Pads {	
 	display: flex;
@@ -138,6 +139,23 @@ html, body {
 }
 
 .Pad.on {
-	background: #0087ff!important;
+	background: #0087ff !important;
     box-shadow: 0 0 12px 0 rgba(0,135,255,.8);
 }
+
+.Footer {
+	text-align: center;
+	font-size: calc(5px + 1vw);
+}
+
+.Footer a:link {
+	color: #0087ff;
+}  
+ 
+.Footer a:visited {
+	color: #0087ff;
+}
+
+.Footer a:hover {
+	color: #0464b8d8; 
+} 

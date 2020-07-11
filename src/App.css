@@ -4,6 +4,8 @@
 
 html, body {
 	width: 100%;
+	height: 100vh;
+	background-color: #1e1e21;	
 }
 
 .App {	
@@ -16,6 +18,7 @@ html, body {
 
 #appTitle {
 	text-align: center;
+	font-size: calc(8vmin);
 } 
 
 .SequencerBody {	
@@ -25,10 +28,10 @@ html, body {
 
 .PlayButton {
 	background: #36363c;
-    border-radius: 1vw; 
+    border-radius: calc(2px + 0.5vw);
 	cursor: pointer;
-	font-size: 2.5vw;
-	margin: 1vw;
+	font-size: calc(8px + 1vw);
+	margin: 2vw;
 	padding-left: 2vw;
 	padding-right: 2vw;
 	padding-top: 1vw;
@@ -46,7 +49,7 @@ html, body {
 
 .BPMButton {
 	display: inline-grid;
-	font-size: 2.5vw;
+	font-size: calc(8px + 1vw);
 	vertical-align: middle;
 	width: 20vw;	
 	margin-top: 2vw; 	
@@ -61,7 +64,8 @@ html, body {
 	color:white;
 	border-radius: 0.05vw; 
 	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
-	padding: 1vw; 	
+	padding: 1vw; 
+	font-size: calc(8px + 0.8vw);	
 }
 
 .BPMButton input[type=range] {
@@ -72,7 +76,7 @@ html, body {
 
 .VolumeFader {
 	display: inline-grid;
-	font-size: 2.5vw;
+	font-size: calc(8px + 1vw);
 	vertical-align: top;
 	width: 20vw;	
 	margin-top: 2vw; 	
@@ -88,6 +92,10 @@ html, body {
 	border-radius: 4px; 
 	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);	
 }
+
+.PadsGroup {
+	padding: 1vw;
+}
  
 .Pads {	
 	display: flex;
@@ -101,7 +109,7 @@ html, body {
 	width: 5vw; 
 	flex-grow: 1;
 	align-self: center;	
-	font-size: 2.5vw;
+	font-size: calc(6px + 1vw);
 } 
 
 .Pad-container {
@@ -145,7 +153,8 @@ html, body {
 
 .Footer {
 	text-align: center;
-	font-size: calc(5px + 1vw);
+	font-size: calc(7px + 0.6vw);
+	margin: 1vw;
 }
 
 .Footer a:link {

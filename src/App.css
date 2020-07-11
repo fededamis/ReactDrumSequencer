@@ -39,41 +39,48 @@ html, body {
 }
 
 .BPMButton {
-	/* display: inline-grid; */
-	font-size: calc(2vmin);
+	display: inline-grid;
+	font-size: 2.5vw;
 	vertical-align: middle;
-	width: 30%;	
-	margin: 1em;
-
-	display: none;
+	width: 20vw;	
+	margin-top: 2vw; 	
+	margin-bottom: 2vw; 	
+	margin-left: 4vw; 	
+	margin-right: 4vw; 	
 }
 
 .BPMButton input {
 	width: inherit;
 	background: #36363c;
 	color:white;
-	border-radius: 4px; 
+	border-radius: 0.05vw; 
 	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
-	padding: 1em;
+	padding: 1vw; 	
+}
+
+.BPMButton input[type=range] {
+	padding: 0;
+	margin-top: 1vw;
+	width: 22vw;
 }
 
 .VolumeFader {
-	/* display: inline-grid; */
-	font-size: calc(2vmin);
-	vertical-align: middle;
-	width: 30%;	
-	margin: 1em;
-
-	display: none;
-}
+	display: inline-grid;
+	font-size: 2.5vw;
+	vertical-align: top;
+	width: 20vw;	
+	margin-top: 2vw; 	
+	margin-bottom: 2vw; 	
+	margin-left: 4vw; 	
+	margin-right: 4vw; 
+} 
 
 .VolumeFader input {
 	width: inherit;
 	background: #36363c;
 	color:white;
 	border-radius: 4px; 
-	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);
-	padding: 1em;
+	box-shadow: 0 1px 3px 0 rgba(blue, 0.3);	
 }
 
 .PadsGroup {
